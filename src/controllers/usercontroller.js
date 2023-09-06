@@ -132,28 +132,26 @@ export const finishGithubLogin = async (req,res) => {
 
 
 export const GetEditProfile = (req,res) => {
-    return res.render("users/edit_profile"); //Error: Failed to lookup view "/users/edit_profile" in views directory "D:\VSClearn\wetube-clone/src/views" 에러가 생기는 이유? /users 를 해야 views/users/edit~ 이 되는것 아닌가?
+    return res.render("users/edit_profile" , {pageTitle:"Editting Profile"}); //Error: Failed to lookup view "/users/edit_profile" in views directory "D:\VSClearn\wetube-clone/src/views" 에러가 생기는 이유? /users 를 해야 views/users/edit~ 이 되는것 아닌가?
 }
 
 export const PostEditProfile = async (req,res) => {
     const {session:{
-        user:{_id , username , email , location},
+        user:{_id , username , email , location , AvatarUrl},
       },
         body: {EditName , EditEmail , EditLocation},
     } = req;
+    const file = req.file;
     const CheckDuplicateUser = await User.findOne(
         {
             $or : [{username : EditName}, {email : EditEmail}]
         });
-    console.log("username is : " , username);
-    console.log("EditName is :" , EditName);
-    console.log("CDU is : " , CheckDuplicateUser);
-   
     if(CheckDuplicateUser){
         return res.status(400).render("users/edit_profile" , {errorMessage:"Already name or email Exists!"});
     }
     else{
         const UpdatedUser = await User.findByIdAndUpdate(_id,{
+            AvatarUrl: file ? file.path : AvatarUrl ,
             username:EditName,
             email:EditEmail,
             location:EditLocation,
@@ -162,26 +160,48 @@ export const PostEditProfile = async (req,res) => {
         );
         req.session.user = UpdatedUser;
         return res.redirect("edit_profile");
-    }
-
-
-    /*
-    if(email !== EditEmail){
-        const CheckEmail = await User.exists({email : EditEmail})
-        try{if(CheckEmail){
-            res.status(400).render("users/edit_profile" , {pageTitle:"Editprofile" , errorMessage:"This email already exists"});
-        }else{
-            req.session.user = UpdatedUser;
-            return res.redirect("/");
-        }
-    }catch{
-            res.redirect("/")
-        }
-       
-    } */
-
-
-        
-        
+    } 
     }
     
+
+   export const GetEditPassword = (req,res) => {
+        res.render("users/edit_password" , {pageTitle:"Change Password"})
+    }
+
+   export const PostEditPassword = async (req,res) => {
+        const {
+            session : 
+            {user: {_id , password}},
+            body:
+            {newpassword , newpassword1 , oldpassword},
+        } = req;
+
+        const ok = await bcrypt.compare(oldpassword ,password)
+        
+        if(!ok) {
+            return res.status(400).render("users/edit_password" , {pageTitle:"Change Password" , errorMessage:"Current password is incorrect"});
+        }
+        if(newpassword !== newpassword1){
+            return res.status(400).redirect("users/edit_password" , {pageTitle:"Change Password" , errorMessage:"They are not the same"})
+        }
+        else{
+            const user = await User.findById(_id);
+            user.password = newpassword;
+            await user.save(); //DB저장소
+            req.session.user.password = user.password
+            return res.redirect("/logout");
+          
+        }
+        return res.redirect("/");
+    }
+
+
+    export const see = async (req,res) => {
+        const {id} = req.params
+        const user = await User.findById(id).populate("videos");
+        console.log(user); 
+        if (!user){
+            return res.status(400).render("404error");
+        }
+        return res.render("users/myprofile" , {pageTitle : `${user.username}의 profile page` , user })
+    }

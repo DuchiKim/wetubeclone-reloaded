@@ -1,3 +1,4 @@
+import "dotenv/config"
 import "./database"
 import "./src/models/Video"
 import app from "./server"

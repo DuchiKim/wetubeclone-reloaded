@@ -1,12 +1,14 @@
 import express from "express";
-import {join,login} from "../controllers/usercontroller"
+import {getjoin,postjoin,getLogin,postLogin,getlogout, GetEditProfile, PostEditProfile} from "../controllers/usercontroller"
 import {videos } from "../controllers/globalcontroller"
-import {handleHome} from "../controllers/videocontroller"
+import {handleHome , searchVideo} from "../controllers/videocontroller"
+import { protectormiddleware } from "../controllers/middlewares";
 const globalRouter = express.Router();
 
 globalRouter.get ("/" , handleHome)
 globalRouter.get ("/videos" , videos)
-globalRouter.get ("/join" , join);
-globalRouter.get ("/login" , login);
-
+globalRouter.route ("/join").get(getjoin).post(postjoin);
+globalRouter.route ("/login").get(getLogin).post(postLogin);
+globalRouter.get( "/logout", getlogout)
+globalRouter.get ("/search" , searchVideo);
 export default globalRouter

@@ -1,0 +1,12 @@
+extends base.pug
+
+block content 
+    if errorMessage
+        h1=errorMessage 
+    form(method="POST")
+        input(type="text" , placeholder="insert username" , required , name="username")
+        input(type="password" , placeholder="enter your password" , required , name="password")
+        br
+        a(href="/users/github/start") Login with github
+        br
+        input(type="submit" , value="Login")

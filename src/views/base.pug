@@ -9,7 +9,28 @@ html(lang="ko")
     nav
       ul
         li
-          a(href="/videos/upload") Upload Video
+          li 
+            a(href="/videos/upload") Upload Video
+            li 
+          li 
+            a(href="/") Home
+          li 
+            a(href="/search") Search
+           
+          if loggedIn
+            li 
+              a(href="/logout") Logout 
+            li 
+              a(href="/users/edit_profile") This is #{loggedInUser.username}`s profile.
+            li  
+              a(href=`/users/${loggedInUser._id}`) My Profile Page 
+          else 
+            li 
+              a(href="/join") Join
+            li 
+              a(href="/login") Login
+          
+         
 
     main
       block content

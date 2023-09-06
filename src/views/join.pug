@@ -1,0 +1,12 @@
+extends base.pug
+
+block content 
+    if errorMessage
+        h1=errorMessage 
+    form(method="POST")
+        input(type="text" , placeholder="insert username" , required , name="username")
+        input(type="email" , placeholder="E-mail" , required , name="email")
+        input(type="password" , placeholder="enter your password" , required , name="password")
+        input(type="password" , placeholder="check your password" , required , name="password1")
+        input(type="text" , placeholder="enter your location")
+        input(type="submit" , value="생성")
